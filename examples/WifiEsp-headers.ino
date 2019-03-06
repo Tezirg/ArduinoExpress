@@ -59,5 +59,4 @@ void      setup()
 void      loop() 
 {
   rest_server.Run();
-  //delay(100);
 }
