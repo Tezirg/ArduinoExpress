@@ -8,20 +8,18 @@
   SoftwareSerial Serial1(6, 7); // RX, TX
 #endif
 
-#include "RestServer.hpp"
+#include "RestServer.hpp" 
 
-char ssid[] = "esp_wifi";  // New network SSID (name)
-char pass[] = "123456789"; // New network password
+char ssid[] = "";              // your network SSID (name)
+char pass[] = "";              // your network password
+int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 WiFiEspServer                             esp_server(80);
 RestServer<WiFiEspServer, WiFiEspClient>  rest_server(esp_server);
 
-void      handleRoot(RestRequest& req, RestResponse& res)
+void      handleRedirect(RestRequest& req, RestResponse& res)
 {
-  res.status(200);
-  res.type("application/json");
-  String body = "{ \"Test\": 42, \"array-test\": [0,1,2,3,4,5]}";
-  res.send(body.c_str());
+  res.redirect("https://google.com");
 }
 
 void      setup() 
@@ -34,17 +32,22 @@ void      setup()
 
   // Init ESP WiFi server
   WiFi.init(&Serial1);
-  // We'll use ip 192.168.0.10
-  IPAddress localIp(192, 168, 0, 10);
-  WiFi.configAP(localIp);
-  // Create AP
-  int status = WiFi.beginAP(ssid, 10, pass, ENC_TYPE_WPA2_PSK);
-  Serial.println("Access point started");
+  // Connect to Wifi
+  while (status != WL_CONNECTED) {
+    Serial.print("Attempting to connect to WPA SSID: ");
+    Serial.println(ssid);
+    status = WiFi.begin(ssid, pass);
+  }
+  Serial.println("Connected to WiFi");
+  IPAddress ip = WiFi.localIP();
+  Serial.print("IP Address: ");
+  Serial.println(ip);
+  
   esp_server.begin();
   Serial.println("Server started");
 
-  // Add basic route
-  rest_server.All("/", handleRoot);
+  // Add redirection handler
+  rest_server.All("/redirect", handleRedirect);
 }
 
 void      loop() 
