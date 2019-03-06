@@ -10,6 +10,20 @@ public:
 		_status(400),
 		_headers_size(0)
 	{
+		reset();
+	}
+	
+	void	reset()
+	{
+		_status = 400;
+		memset(_body, 0, (MAX_BODY_LEN + 1) * sizeof(_body[0]));
+		memset(_content_type, 0, (MAX_CONTENT_LEN + 1) * sizeof(_content_type[0]));
+		_headers_size = 0;
+		for (uint16_t i = 0; i < MAX_HEADERS; i++)
+		{
+			memset(_headers_fields[i], 0, (MAX_HEADER_LEN + 1) * sizeof(_headers_fields[0][0]));
+			memset(_headers_values[i], 0, (MAX_HEADER_LEN + 1) * sizeof(_headers_values[0][0]));
+		}
 	}
 	
 	char*	get(const char* field)
@@ -61,6 +75,9 @@ public:
 			_headers_values[_headers_size][0] = 0; 
 		// Increment counter
 		_headers_size++;
+		// Force null termination 
+		_headers_fields[_headers_size][MAX_HEADER_LEN] = 0;
+		_headers_values[_headers_size][MAX_HEADER_LEN] = 0;
 	}
 	
 	void	status(int statusCode)

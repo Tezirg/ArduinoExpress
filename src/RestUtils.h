@@ -20,7 +20,7 @@
 #define MAX_METHOD_LEN				7
 #define MAX_ROUTES 					8
 #define MAX_ROUTE_LEN				32
-#define MAX_HEADERS					4
+#define MAX_HEADERS					8
 #define MAX_HEADER_LEN				56
 #define MAX_CONTENT_LEN				28
 #define MAX_PARAMS_LEN				56

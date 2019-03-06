@@ -6,10 +6,29 @@
 
 class RestRequest {
 public:
-	RestRequest() :
-		xhr(false),
-		_headers_size(0)
-	{}
+	RestRequest()
+	{
+		reset();
+	}
+	
+	void	reset()
+	{
+		xhr = false;
+		memset(baseUrl, 0, (MAX_URL_LEN + 1) * sizeof(baseUrl[0]));
+		memset(body, 0, (MAX_BODY_LEN + 1) * sizeof(body[0]));
+		memset(hostname, 0, (MAX_HEADER_LEN + 1) * sizeof(_headers_fields[0][0]));
+		memset(method, 0, (MAX_METHOD_LEN + 1) * sizeof(method[0]));
+		memset(params, 0, (MAX_PARAMS_LEN + 1) * sizeof(params[0]));
+		memset(query, 0, (MAX_QUERY_LEN + 1) * sizeof(query[0]));
+		memset(_content_type, 0, (MAX_CONTENT_LEN + 1) * sizeof(_content_type[0]));
+		
+		_headers_size = 0;
+		for (uint16_t i = 0; i < MAX_HEADERS; i++)
+		{
+			memset(_headers_fields[i], 0, (MAX_HEADER_LEN + 1) * sizeof(_headers_fields[0][0]));
+			memset(_headers_values[i], 0, (MAX_HEADER_LEN + 1) * sizeof(_headers_values[0][0]));
+		}
+	}
 	
 	bool	is(const char *content_type)
 	{

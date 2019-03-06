@@ -19,8 +19,6 @@ public:
 		_server(server)
 	{
 		// Set all buffers to 0
-		memset(_route, 0, (MAX_ROUTE_LEN + 1) * sizeof(_route[0]));
-		memset(_method, 0, (MAX_METHOD_LEN + 1) * sizeof(_method[0]));
 		memset(_field, 0, (MAX_HEADER_LEN + 1) * sizeof(_field[0]));
 		memset(_value, 0, (MAX_HEADER_LEN + 1) * sizeof(_value[0]));
 		memset(_routes, 0, MAX_ROUTES * sizeof(struct s_rest_route));
@@ -30,6 +28,8 @@ public:
 		_client = _server.available();
 		if (_client) 
 		{
+			_request.reset();
+			_response.reset();
 			parseRequest();
 			router();
 			send();
@@ -98,6 +98,9 @@ private:
 		while (_client.available()) 
 		{
 			c = _client.read();
+			if (c == -1) {
+				continue;
+			}
 			if (c == delim)
 				break;
 		}
@@ -111,12 +114,15 @@ private:
 		while (_client.available()) 
 		{
 			c = _client.read();
+			if (c == -1) {
+				continue;
+			}
 			if (c == ' ')// Done parsing METHOD
 				break;
-			_method[method_idx] = c;
+			_request.method[method_idx] = c;
 			method_idx++;
 		}
-		_method[method_idx] = 0; // Null terminate METHOD
+		_request.method[method_idx] = 0; // Null terminate METHOD
 	}
 	
 	void						readRoute()
@@ -127,27 +133,36 @@ private:
 		while (_client.available()) 
 		{
 			c = _client.read();
+			if (c == -1) {
+				continue;
+			}
 			if (c == ' ') // End of route
 				break;
 			if (route_idx < MAX_ROUTE_LEN) // Route is not long
 			{
-				_route[route_idx] = c;
+				_request.baseUrl[route_idx] = c;
 				route_idx++;
 			}
 		}
-		_route[route_idx] = 0; // Null terminate the route
+		_request.baseUrl[route_idx] = 0; // Null terminate the route
 	}
 	
 	bool						readHeader()
 	{
 		char					c;
-		short					field_idx = 0;
-		short					value_idx = 0;
+		uint16_t				field_idx = 0;
+		uint16_t				value_idx = 0;
+		
+		// Reset buffers
+		memset(_field, 0, (MAX_HEADER_LEN + 1) * sizeof(_field[0]));
+		memset(_value, 0, (MAX_HEADER_LEN + 1) * sizeof(_value[0]));
 		
 		// Read field
 		while (_client.available()) 
 		{
 			c = _client.read();
+			if (c == -1 || c == '\r')
+				continue;
 			if (c == '\n' || c == ':') // Empty line or done for field
 				break;
 			if (field_idx < MAX_HEADER_LEN) 
@@ -157,17 +172,18 @@ private:
 			}
 		}
 		_field[field_idx] = 0; // Null terminate field
-		
 		if (field_idx == 0) // Was just a new line
 			return false;
 
 		// Read space separator
-		c = _client.read();
+		readUntil(' ');
 		
 		// Read value
 		while (_client.available()) 
 		{
 			c = _client.read();
+			if (c == -1 || c == '\r')
+				continue;
 			if (c == '\n') // End of line
 				break;
 			if (value_idx < MAX_HEADER_LEN) 
@@ -188,8 +204,9 @@ private:
 		while (_client.available()) 
 		{
 			c = _client.read();
-			if (c == '\n') // End of line
-				break;
+			if (c == -1) {
+				continue;
+			}
 			if (body_idx < MAX_BODY_LEN) 
 			{
 				_request.body[body_idx] = c;
@@ -202,21 +219,17 @@ private:
 	void						parseRequest()
 	{
 		readMethod();
-		strcpy(_request.method, _method);
-		readRoute();
-		// TODO handle route split
-		
+		readRoute();	
 		readUntil('\n');
 		while (readHeader()) {
 			// Look for special headers	
-			// TODO: Add Accept handler
 			if (strncmp(F_str(HEADER_XHR_FIELD), _field, MAX_HEADER_LEN) == 0 &&
 				strncmp(F_str(HEADER_XHR_VALUE), _value, MAX_HEADER_LEN) == 0)
 				_request.xhr = true;
 			else if (strncmp(F_str(HEADER_HOST_FIELD), _field, MAX_HEADER_LEN) == 0)
-				strncpy(_request.hostname, _field, MAX_HEADER_LEN);
-			else if (strncmp(F_str(HEADER_ACCEPT_FIELD), _field, MAX_HEADER_LEN) == 0)
 				strncpy(_request.hostname, _value, MAX_HEADER_LEN);
+			else if (strncmp(F_str(HEADER_ACCEPT_FIELD), _field, MAX_HEADER_LEN) == 0)
+				strncpy(_request._content_type, _value, MAX_CONTENT_LEN);
 			else
 				_request.set(_field, _value);
 		}
@@ -228,17 +241,16 @@ private:
 		for(int i = 0; i < _routes_size; i++)
 		{
 			// Check if the routes names matches
-			if(strncmp(_route, _routes[i].name, MAX_ROUTE_LEN) != 0)
+			if(strncmp(_request.baseUrl, _routes[i].name, MAX_ROUTE_LEN) != 0)
 				continue;
 
 			// Check if the HTTP METHOD matters for this route
 			  if(strncmp(_routes[i].method, "*", MAX_METHOD_LEN) != 0) 
 			  {
 				// If it matters, check if the methods matches
-				if(strncmp(_method, _routes[i].method, MAX_METHOD_LEN) != 0)
+				if(strncmp(_request.method, _routes[i].method, MAX_METHOD_LEN) != 0)
 				  continue;
 			  }
-
 			  // Route callback (function)
 			  _routes[i].callback(_request, _response);
 		}
@@ -301,9 +313,7 @@ private:
 	Client_t					_client;
 	RestRequest					_request;
 	RestResponse				_response;
-	
-	char						_method[MAX_METHOD_LEN + 1];
-	char 						_route[MAX_ROUTE_LEN + 1];
+
 	char						_field[MAX_HEADER_LEN + 1];
 	char						_value[MAX_HEADER_LEN + 1];
 };
