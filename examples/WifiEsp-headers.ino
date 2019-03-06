@@ -8,7 +8,7 @@
   SoftwareSerial Serial1(6, 7); // RX, TX
 #endif
 
-#include "RestServer.hpp" 
+#include "RestServer.hpp"
 
 char ssid[] = "SSID";            // your network SSID (name)
 char pass[] = "PASSWORD";        // your network password
@@ -19,16 +19,18 @@ RestServer<WiFiEspServer, WiFiEspClient>  rest_server(esp_server);
 
 void      handleRoot(RestRequest& req, RestResponse& res)
 {
+  Serial.println(req.method);
+  Serial.println(req.baseUrl);
   res.status(200);
-  res.type("application/json");
-  String body = "{ \"Test\": 42, \"array-test\": [0,1,2,3,4,5]}";
+  res.type("text/plain");
+  String body = "Your browser is " + String(req.get("User-Agent"));
   res.send(body.c_str());
 }
 
 void      setup() 
 {
   // Init Serial communications
-  Serial.begin(9600);
+  Serial.begin(100000);
   delay(250);
   Serial1.begin(115200);
   delay(250);
@@ -37,7 +39,7 @@ void      setup()
   WiFi.init(&Serial1);
   // Connect to Wifi
   // attempt to connect to WiFi network
-  while ( status != WL_CONNECTED) {
+  while (status != WL_CONNECTED) {
     Serial.print("Attempting to connect to WPA SSID: ");
     Serial.println(ssid);
     status = WiFi.begin(ssid, pass);
@@ -57,4 +59,5 @@ void      setup()
 void      loop() 
 {
   rest_server.Run();
+  //delay(100);
 }

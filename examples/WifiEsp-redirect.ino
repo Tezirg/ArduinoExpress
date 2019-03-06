@@ -10,8 +10,8 @@
 
 #include "RestServer.hpp" 
 
-char ssid[] = "";              // your network SSID (name)
-char pass[] = "";              // your network password
+char ssid[] = "SSID";            // your network SSID (name)
+char pass[] = "PASSWORD";        // your network password
 int status = WL_IDLE_STATUS;     // the Wifi radio's status
 
 WiFiEspServer                             esp_server(80);
@@ -53,5 +53,4 @@ void      setup()
 void      loop() 
 {
   rest_server.Run();
-  delay(100);
 }
