@@ -7,7 +7,8 @@ The library requires AT LEAST 4Ko of dynamic memory and AT LEAST 12Ko of program
 Just tested on Teensy 3.2 but it should work with other boards
 
 ## Documentation
-The interface as close as possible imitating Express
+The library imitates Express as much as possible
+
 ### RestServer
 
  * [All](https://expressjs.com/en/4x/api.html#app.all): matches all HTTP verbs
@@ -18,9 +19,11 @@ The interface as close as possible imitating Express
  
 ### RestRequest
 Represents the HTTP request and has properties for the request query string, parameters, body, HTTP headers, and so on.
+
 Most of the [Request interface](https://expressjs.com/en/4x/api.html#req) is implemented.
 
 ### RestResponse
 Represents the HTTP response that the RestServer sends when it gets an HTTP request.
+
 Most of the [Response interface](https://expressjs.com/en/4x/api.html#res) is implemented.
 
