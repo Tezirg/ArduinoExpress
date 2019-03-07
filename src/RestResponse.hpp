@@ -7,17 +7,15 @@
 class RestResponse {
 public:
 	RestResponse():
-		_status(400),
+		_status(500),
 		_headers_size(0)
 	{
 		reset();
 	}
 	
-	void	reset()
+	void	    reset()
 	{
-		_status = 400;
-		memset(_body, 0, (MAX_BODY_LEN + 1) * sizeof(_body[0]));
-		memset(_content_type, 0, (MAX_CONTENT_LEN + 1) * sizeof(_content_type[0]));
+		sendStatus(404);
 		_headers_size = 0;
 		for (uint16_t i = 0; i < MAX_HEADERS; i++)
 		{
@@ -26,11 +24,9 @@ public:
 		}
 	}
 	
-	char*	get(const char* field)
+	char*	    get(const char* field)
 	{
-		if (_headers_size == 0)
-			return 0;
-		for (int i = 0; i < _headers_size; i++)
+		for (int i = 0; i < MAX_HEADERS; i++)
 		{
 			if (strncmp(_headers_fields[i], field, MAX_HEADER_LEN) == 0)
 				return _headers_values[i];
@@ -38,7 +34,7 @@ public:
 		return 0;
 	}
 	
-	void	location(const char *path)
+	void	    location(const char *path)
 	{
 		set(F_str(HEADER_LOCATION_FIELD), path);
 	}
@@ -49,7 +45,7 @@ public:
 		location(path);
 	}
 	
-	void	send(const char *body)
+	void	    send(const char *body)
 	{
 		strncpy(_body, body, MAX_BODY_LEN);
 	}
@@ -60,9 +56,10 @@ public:
 
 		_status = statusCode;
 		strncpy(_body, default_body, MAX_BODY_LEN);
+   type(F_str(HEADER_CONTENT_TYPE_VALUE));
 	}
 	
-	void	set(const char *field, const char* value = 0)
+	void	    set(const char *field, const char* value = 0)
 	{
 		// Circular buffering if to many headers
 		if (_headers_size >= MAX_HEADERS)
@@ -75,27 +72,24 @@ public:
 			_headers_values[_headers_size][0] = 0; 
 		// Increment counter
 		_headers_size++;
-		// Force null termination 
-		_headers_fields[_headers_size][MAX_HEADER_LEN] = 0;
-		_headers_values[_headers_size][MAX_HEADER_LEN] = 0;
 	}
 	
-	void	status(int statusCode)
+	void	    status(int statusCode)
 	{
 		_status = statusCode;
 	}
 	
-	void	type(char* content_type)
+	void	    type(char* content_type)
 	{
 		strncpy(_content_type, content_type, MAX_CONTENT_LEN);
 	}
 	
 	uint16_t	_status;
 	uint8_t		_headers_size;
-	char		_headers_fields[MAX_HEADERS][MAX_HEADER_LEN + 1];
-	char		_headers_values[MAX_HEADERS][MAX_HEADER_LEN + 1];
-	char		_content_type[MAX_CONTENT_LEN + 1];
-	char		_body[MAX_BODY_LEN + 1];
+	char		  _headers_fields[MAX_HEADERS][MAX_HEADER_LEN + 1];
+	char		  _headers_values[MAX_HEADERS][MAX_HEADER_LEN + 1];
+	char		  _content_type[MAX_CONTENT_LEN + 1];
+	char		  _body[MAX_BODY_LEN + 1];
 };
 
 #endif
