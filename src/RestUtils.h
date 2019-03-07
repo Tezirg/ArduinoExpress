@@ -1,43 +1,43 @@
 #ifndef _REST_UTILS_H_
 #define _REST_UTILS_H_
 
-#define HTTP_1_1					F("HTTP/1.1")
-#define CRLF						F("\r\n")
-#define HEADER_SEPARATOR			F(": ")
-#define HEADER_SERVER_FIELD			F("Server")
+#define HTTP_1_1			F("HTTP/1.1")
+#define CRLF				F("\r\n")
+#define HEADER_SEPARATOR		F(": ")
+#define HEADER_SERVER_FIELD		F("Server")
 #define HEADER_CONTENT_TYPE_FIELD	F("Content-Type")
 #define HEADER_CONTENT_LENGTH_FIELD	F("Content-Length")
 #define HEADER_CONTENT_TYPE_FIELD	F("Content-Type")
 #define HEADER_CONTENT_TYPE_VALUE	F("text/plain")
 #define HEADER_CONNECTION_FIELD		F("Connection")
 #define HEADER_CONNECTION_VALUE		F("close")
-#define HEADER_ACCEPT_FIELD			F("Accept")
-#define HEADER_HOST_FIELD			F("Host")
-#define HEADER_XHR_FIELD			F("X-Requested-With")
-#define HEADER_XHR_VALUE			F("XMLHttpRequest")
+#define HEADER_ACCEPT_FIELD		F("Accept")
+#define HEADER_HOST_FIELD		F("Host")
+#define HEADER_XHR_FIELD		F("X-Requested-With")
+#define HEADER_XHR_VALUE		F("XMLHttpRequest")
 #define HEADER_LOCATION_FIELD		F("Location")
 
-#define MAX_METHOD_LEN				7
-#define MAX_ROUTES					6
-#define MAX_ROUTE_LEN				16
-#define MAX_HEADERS					8
-#define MAX_HEADER_LEN				16
-#define MAX_CONTENT_LEN				28
-#define MAX_PARAMS_LEN				32
-#define MAX_QUERY_LEN				32
-#define MAX_URL_LEN					32
+#define MAX_METHOD_LEN			7
+#define MAX_ROUTES			6
+#define MAX_ROUTE_LEN			16
+#define MAX_HEADERS			8
+#define MAX_HEADER_LEN			16
+#define MAX_CONTENT_LEN			28
+#define MAX_PARAMS_LEN			32
+#define MAX_QUERY_LEN			32
+#define MAX_URL_LEN			32
 #define MAX_REQUEST_BODY_LEN		32
 #define MAX_RESPONSE_BODY_LEN		32
-#define MAX_STATUS_BODY_LEN			25
+#define MAX_STATUS_BODY_LEN		25
 
-#define HTTP_METHOD_ALL				F("*")
-#define HTTP_METHOD_GET				F("GET")
-#define HTTP_METHOD_PUT				F("PUT")
-#define HTTP_METHOD_HEAD			F("HEAD")
-#define HTTP_METHOD_POST			F("POST")
-#define HTTP_METHOD_PATCH			F("PATCH")
-#define HTTP_METHOD_DELETE			F("DELETE")
-#define HTTP_METHOD_OPTIONS			F("OPTIONS")
+#define HTTP_METHOD_ALL			F("*")
+#define HTTP_METHOD_GET			F("GET")
+#define HTTP_METHOD_PUT			F("PUT")
+#define HTTP_METHOD_HEAD		F("HEAD")
+#define HTTP_METHOD_POST		F("POST")
+#define HTTP_METHOD_PATCH		F("PATCH")
+#define HTTP_METHOD_DELETE		F("DELETE")
+#define HTTP_METHOD_OPTIONS		F("OPTIONS")
 
 const PROGMEM uint16_t rest_status_codes[] = {
 	// 1xx Informational response
@@ -75,7 +75,7 @@ const PROGMEM char rest_status_bodies[][MAX_STATUS_BODY_LEN]  = {
 };
 
 char*				F_str(const __FlashStringHelper* str) {
-  static char str_buffer[MAX_HEADER_LEN + 1] = {0};
+  static char			str_buffer[MAX_HEADER_LEN + 1] = {0};
   strcpy_P(str_buffer, (char*)str);
   return str_buffer;
 }
