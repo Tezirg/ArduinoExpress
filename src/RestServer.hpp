@@ -32,8 +32,8 @@ public:
 			router();
 			send();
 			_client.stop();
-      _request.reset();
-      _response.reset();
+			_request.reset();
+			_response.reset();
 		}
 	}
 	
@@ -78,7 +78,7 @@ public:
 	}
 
 private:
-	void addRoute(const char* method, const char* route, rest_callback_t callback)
+	void 			addRoute(const char* method, const char* route, rest_callback_t callback)
 	{
 		// Circular buffer if too many routes
 		if (_routes_size >= MAX_ROUTES)
@@ -90,9 +90,9 @@ private:
 		_routes_size++;
 	}
 
-	void						readUntil(char delim)
+	void			readUntil(char delim)
 	{
-		char					c;
+		char		c;
 
 		while (_client.available()) 
 		{
@@ -105,10 +105,10 @@ private:
 		}
 	}
 
-	void						readMethod()
+	void			readMethod()
 	{
-		char 					c;
-		short					method_idx = 0;
+		char 		c;
+		short		method_idx = 0;
 
 		while (_client.available()) 
 		{
@@ -124,10 +124,10 @@ private:
 		_request.method[method_idx] = 0; // Null terminate METHOD
 	}
 	
-	void						readRoute()
+	void			readRoute()
 	{
-		char					c;
-		short					route_idx = 0;
+		char		c;
+		short		route_idx = 0;
 
 		while (_client.available()) 
 		{
@@ -146,11 +146,11 @@ private:
 		_request.originalUrl[route_idx] = 0; // Null terminate the route
 	}
 	
-	bool						readHeader()
+	bool			readHeader()
 	{
-		char					c;
-		uint16_t				field_idx = 0;
-		uint16_t				value_idx = 0;
+		char		c;
+		uint16_t	field_idx = 0;
+		uint16_t	value_idx = 0;
 		
 		// Reset buffers
 		memset(_field, 0, (MAX_HEADER_LEN + 1) * sizeof(_field[0]));
@@ -195,10 +195,10 @@ private:
 		return true;
 	}
 	
-	void						readBody()
+	void			readBody()
 	{
-		char					c;
-		short					body_idx = 0;
+		char		c;
+		short		body_idx = 0;
 
 		while (_client.available()) 
 		{
@@ -215,40 +215,40 @@ private:
 		_request.body[body_idx] = 0;
 	}
 
-  void            parseRoute()
-  {
-    bool          base = true;
-    uint16_t      base_idx = 0;
-    uint16_t      query_idx = 0;
-    
-    for (uint16_t i = 0; i < MAX_QUERY_LEN + MAX_URL_LEN; i++)
-    {
-      if (_request.originalUrl[i] == '?') 
-      {
-        base = false;
-        continue;
-      }
-      if (base && base_idx < MAX_URL_LEN)
-      {
-        _request.baseUrl[base_idx] = _request.originalUrl[i];
-        base_idx++;
-      }
-      else if (query_idx < MAX_QUERY_LEN)
-      {
-        _request.query[query_idx] = _request.originalUrl[i];
-        query_idx++;
-      }
-    }
-    _request.baseUrl[base_idx] = 0;
-    _request.query[query_idx] = 0; 
-  }
+	void			parseRoute()
+	{
+		bool		base = true;
+		uint16_t	base_idx = 0;
+		uint16_t	query_idx = 0;
+		
+		for (uint16_t i = 0; i < MAX_QUERY_LEN + MAX_URL_LEN; i++)
+		{
+			if (_request.originalUrl[i] == '?') 
+			{
+				base = false;
+				continue;
+			}
+			if (base && base_idx < MAX_URL_LEN)
+			{
+				_request.baseUrl[base_idx] = _request.originalUrl[i];
+				base_idx++;
+			}
+			else if (query_idx < MAX_QUERY_LEN)
+			{
+				_request.query[query_idx] = _request.originalUrl[i];
+				query_idx++;
+			}
+		}
+		_request.baseUrl[base_idx] = 0;
+		_request.query[query_idx] = 0; 
+	}
   
-	void						parseRequest()
+	void			parseRequest()
 	{
 		readMethod();
 		readRoute();	
 		readUntil('\n');
-    parseRoute();
+		parseRoute();
 		while (readHeader()) {
 			// Look for special headers	
 			if (strncmp(F_str(HEADER_XHR_FIELD), _field, MAX_HEADER_LEN) == 0 &&
@@ -264,7 +264,7 @@ private:
 		readBody();
 	}
 
-	void 						router()
+	void 			router()
 	{
 		for(int i = 0; i < _routes_size; i++)
 		{
@@ -273,17 +273,18 @@ private:
 				continue;
 
 			// Check if the HTTP METHOD matters for this route
-			  if(strncmp(_routes[i].method, F_str(HTTP_METHOD_ALL), MAX_METHOD_LEN) != 0) 
-			  {
+			if(strncmp(_routes[i].method, F_str(HTTP_METHOD_ALL), MAX_METHOD_LEN) != 0) 
+			{
 				// If it matters, check if the methods matches
 				if(strncmp(_request.method, _routes[i].method, MAX_METHOD_LEN) != 0)
 				  continue;
-			  }
-			  // Route callback (function)
-			  _routes[i].callback(_request, _response);
+			}
+			// Route callback (function)
+			_routes[i].callback(_request, _response);
 		}
 	}
-	void 						send()
+
+	void 			send()
 	{
 		int content_length = strlen(_response._body);
 
@@ -329,21 +330,21 @@ private:
 	}
 private:
 	struct s_rest_route {
-		char				          method[MAX_METHOD_LEN + 1];
-		char 				          name[MAX_ROUTE_LEN + 1];
-		rest_callback_t 	    callback;
+		char			method[MAX_METHOD_LEN + 1];
+		char			name[MAX_ROUTE_LEN + 1];
+		rest_callback_t		callback;
 	};
 	
-	struct s_rest_route 		_routes[MAX_ROUTES];
-	uint8_t 					      _routes_size;
+	struct s_rest_route		_routes[MAX_ROUTES];
+	uint8_t				_routes_size;
   
-	Server_t& 					    _server;
-	Client_t					      _client;
-	RestRequest					    _request;
-	RestResponse				    _response;
+	Server_t&			_server;
+	Client_t			_client;
+	RestRequest			_request;
+	RestResponse			_response;
 
-	char						        _field[MAX_HEADER_LEN + 1];
-	char						        _value[MAX_HEADER_LEN + 1];
+	char				_field[MAX_HEADER_LEN + 1];
+	char				_value[MAX_HEADER_LEN + 1];
 };
 
 #endif

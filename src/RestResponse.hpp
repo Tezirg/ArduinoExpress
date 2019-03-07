@@ -13,7 +13,7 @@ public:
 		reset();
 	}
 	
-	void	    reset()
+	void	reset()
 	{
 		sendStatus(404);
 		_headers_size = 0;
@@ -24,7 +24,7 @@ public:
 		}
 	}
 	
-	char*	    get(const char* field)
+	char*	get(const char* field)
 	{
 		for (int i = 0; i < MAX_HEADERS; i++)
 		{
@@ -34,7 +34,7 @@ public:
 		return 0;
 	}
 	
-	void	    location(const char *path)
+	void	location(const char *path)
 	{
 		set(F_str(HEADER_LOCATION_FIELD), path);
 	}
@@ -45,21 +45,21 @@ public:
 		location(path);
 	}
 	
-	void	    send(const char *body)
+	void	send(const char *body)
 	{
 		strncpy(_body, body, MAX_RESPONSE_BODY_LEN);
 	}
 	
 	void	sendStatus(int statusCode)
 	{
-		const char*     default_body = get_default_body_from_status(statusCode); 
+		const char*	 default_body = get_default_body_from_status(statusCode); 
 
 		_status = statusCode;
-	  strncpy(_body, default_body, MAX_RESPONSE_BODY_LEN);
-    type(F_str(HEADER_CONTENT_TYPE_VALUE));
+		strncpy(_body, default_body, MAX_RESPONSE_BODY_LEN);
+		type(F_str(HEADER_CONTENT_TYPE_VALUE));
 	}
 	
-	void	    set(const char *field, const char* value = 0)
+	void	set(const char *field, const char* value = 0)
 	{
 		// Circular buffering if to many headers
 		if (_headers_size >= MAX_HEADERS)
@@ -74,22 +74,22 @@ public:
 		_headers_size++;
 	}
 	
-	void	    status(int statusCode)
+	void	status(int statusCode)
 	{
 		_status = statusCode;
 	}
 	
-	void	    type(char* content_type)
+	void	type(char* content_type)
 	{
 		strncpy(_content_type, content_type, MAX_CONTENT_LEN);
 	}
 	
 	uint16_t	_status;
 	uint8_t		_headers_size;
-	char		  _headers_fields[MAX_HEADERS][MAX_HEADER_LEN + 1];
-	char		  _headers_values[MAX_HEADERS][MAX_HEADER_LEN + 1];
-	char		  _content_type[MAX_CONTENT_LEN + 1];
-	char		  _body[MAX_RESPONSE_BODY_LEN + 1];
+	char		_headers_fields[MAX_HEADERS][MAX_HEADER_LEN + 1];
+	char		_headers_values[MAX_HEADERS][MAX_HEADER_LEN + 1];
+	char		_content_type[MAX_CONTENT_LEN + 1];
+	char		_body[MAX_RESPONSE_BODY_LEN + 1];
 };
 
 #endif
