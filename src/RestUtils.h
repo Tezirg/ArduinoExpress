@@ -49,7 +49,7 @@ const PROGMEM uint16_t rest_status_codes[] = {
 	//4xx Client errors
 	400, 401, 402, 403,
 	404, 405, 406, 407,
-	// 5xx HEADER_SERVER_VALUE errors
+	// 5xx Server errors
 	500, 501, 502, 503
 };
 
@@ -69,7 +69,7 @@ const PROGMEM char rest_status_bodies[][MAX_STATUS_BODY_LEN]  = {
 	"Payment Required", "Forbidden",
 	"Not Found", "Method Not Allowed",
 	"Not Acceptable", "Authentication Required",
-	// 5xx HEADER_SERVER_VALUE errors
+	// 5xx Server errors
 	"Internal Error", "Not Implemented",
 	"Bad Gateway", "Service Unavailable"
 };
