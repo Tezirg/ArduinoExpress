@@ -206,7 +206,7 @@ private:
 			if (c == -1) {
 				continue;
 			}
-			if (body_idx < MAX_BODY_LEN) 
+			if (body_idx < MAX_REQUEST_BODY_LEN) 
 			{
 				_request.body[body_idx] = c;
 				body_idx++;

@@ -47,7 +47,7 @@ public:
 	
 	void	    send(const char *body)
 	{
-		strncpy(_body, body, MAX_BODY_LEN);
+		strncpy(_body, body, MAX_RESPONSE_BODY_LEN);
 	}
 	
 	void	sendStatus(int statusCode)
@@ -55,8 +55,8 @@ public:
 		const char*     default_body = get_default_body_from_status(statusCode); 
 
 		_status = statusCode;
-		strncpy(_body, default_body, MAX_BODY_LEN);
-   type(F_str(HEADER_CONTENT_TYPE_VALUE));
+	  strncpy(_body, default_body, MAX_RESPONSE_BODY_LEN);
+    type(F_str(HEADER_CONTENT_TYPE_VALUE));
 	}
 	
 	void	    set(const char *field, const char* value = 0)
@@ -89,7 +89,7 @@ public:
 	char		  _headers_fields[MAX_HEADERS][MAX_HEADER_LEN + 1];
 	char		  _headers_values[MAX_HEADERS][MAX_HEADER_LEN + 1];
 	char		  _content_type[MAX_CONTENT_LEN + 1];
-	char		  _body[MAX_BODY_LEN + 1];
+	char		  _body[MAX_RESPONSE_BODY_LEN + 1];
 };
 
 #endif

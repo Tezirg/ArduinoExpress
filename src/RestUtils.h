@@ -26,7 +26,8 @@
 #define MAX_PARAMS_LEN				      32
 #define MAX_QUERY_LEN				        32
 #define MAX_URL_LEN					        32
-#define MAX_BODY_LEN				        64
+#define MAX_REQUEST_BODY_LEN				32
+#define MAX_RESPONSE_BODY_LEN       32
 #define MAX_STATUS_BODY_LEN			    25
 
 #define HTTP_METHOD_ALL 			      F("*")

@@ -16,7 +16,7 @@ public:
 		xhr = false;
     memset(originalUrl, 0, (MAX_QUERY_LEN + MAX_URL_LEN + 1) * sizeof(originalUrl[0]));
 		memset(baseUrl, 0, (MAX_URL_LEN + 1) * sizeof(baseUrl[0]));
-		memset(body, 0, (MAX_BODY_LEN + 1) * sizeof(body[0]));
+		memset(body, 0, (MAX_REQUEST_BODY_LEN + 1) * sizeof(body[0]));
 		memset(hostname, 0, (MAX_HEADER_LEN + 1) * sizeof(_headers_fields[0][0]));
 		memset(method, 0, (MAX_METHOD_LEN + 1) * sizeof(method[0]));
 		memset(params, 0, (MAX_PARAMS_LEN + 1) * sizeof(params[0]));
@@ -65,7 +65,7 @@ public:
 
   char      originalUrl[MAX_QUERY_LEN + MAX_URL_LEN + 1];
 	char		  baseUrl[MAX_URL_LEN + 1];
-	char		  body[MAX_BODY_LEN + 1];
+	char		  body[MAX_REQUEST_BODY_LEN + 1];
 	char		  hostname[MAX_HEADER_LEN + 1];
 	char		  method[MAX_METHOD_LEN + 1];
 	char		  params[MAX_PARAMS_LEN + 1];
