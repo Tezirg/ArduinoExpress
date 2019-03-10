@@ -2,6 +2,7 @@
 #define _REST_RESPONSE_HPP_
 
 #include <Arduino.h>
+#include <SD.h>
 #include "RestUtils.h"
 
 class RestResponse {
@@ -16,6 +17,9 @@ public:
 	void	reset()
 	{
 		sendStatus(404);
+		memset(_content_type, 0, (MAX_CONTENT_LEN + 1) * sizeof(_content_type[0]));
+		memset(_body, 0, (MAX_RESPONSE_BODY_LEN + 1) * sizeof(_body[0]));
+		memset(_file, 0, (MAX_FILENAME_LEN + 1) * sizeof(_file[0]));
 		_headers_size = 0;
 		for (uint16_t i = 0; i < MAX_HEADERS; i++)
 		{
@@ -49,6 +53,11 @@ public:
 	{
 		strncpy(_body, body, MAX_RESPONSE_BODY_LEN);
 	}
+
+	void	sendFile(const char *file)
+	{
+		strncpy(_file, file, MAX_FILENAME_LEN);
+	}
 	
 	void	sendStatus(int statusCode)
 	{
@@ -79,7 +88,7 @@ public:
 		_status = statusCode;
 	}
 	
-	void	type(char* content_type)
+	void	type(const char* content_type)
 	{
 		strncpy(_content_type, content_type, MAX_CONTENT_LEN);
 	}
@@ -90,6 +99,8 @@ public:
 	char		_headers_values[MAX_HEADERS][MAX_HEADER_LEN + 1];
 	char		_content_type[MAX_CONTENT_LEN + 1];
 	char		_body[MAX_RESPONSE_BODY_LEN + 1];
+	char		_file[MAX_FILENAME_LEN + 1];
 };
 
 #endif
+

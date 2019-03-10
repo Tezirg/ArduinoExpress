@@ -4,6 +4,7 @@
 #include <Arduino.h>
 #include <Server.h>
 #include <Client.h>
+#include <SD.h>
 
 #include "RestUtils.h"
 #include "RestRequest.hpp"
@@ -266,6 +267,8 @@ private:
 
 	void 			router()
 	{
+		bool		match = false;
+
 		for(int i = 0; i < _routes_size; i++)
 		{
 			// Check if the routes names matches
@@ -281,12 +284,36 @@ private:
 			}
 			// Route callback (function)
 			_routes[i].callback(_request, _response);
+			match = true;
+		}
+		if (!match)
+		{
+			_response.sendStatus(404);
 		}
 	}
 
 	void 			send()
 	{
-		int content_length = strlen(_response._body);
+		int 	content_length = strlen(_response._body);
+		bool	is_file = false;
+		File    file_buf;
+
+		if (strlen(_response._file) != 0)
+		{
+			file_buf = SD.open(_response._file);
+			if (file_buf)
+			{
+				_response.status(200);
+				content_length = file_buf.size();
+				is_file = true;
+			}
+			else
+			{
+				_response.sendStatus(404);
+				content_length = strlen(_response._body);
+				is_file = false;
+			}
+		}
 
 		_client.print(HTTP_1_1);
 		_client.print(" ");
@@ -313,20 +340,30 @@ private:
 		
 		if (content_length > 0)
 		{
+			_client.print(HEADER_CONTENT_LENGTH_FIELD);
+			_client.print(HEADER_SEPARATOR);
+			_client.print(content_length);
+			_client.print(CRLF);
+
 			_client.print(HEADER_CONTENT_TYPE_FIELD);
 			_client.print(HEADER_SEPARATOR);
 			_client.print(_response._content_type);
 			_client.print(CRLF);
 			
-			_client.print(HEADER_CONTENT_LENGTH_FIELD);
-			_client.print(HEADER_SEPARATOR);
-			_client.print(content_length);
 			_client.print(CRLF);
-			
-			_client.print("\n");
-			_client.print(_response._body);
+			if (is_file)
+			{
+				Serial.println(_response._file);
+				while (file_buf.available())
+				{
+					int len = file_buf.read(_response._body, MAX_RESPONSE_BODY_LEN);
+					_client.write(_response._body, len);
+				}
+				file_buf.close();
+			}
+			else
+				_client.write(_response._body, content_length);
 		}
-		
 	}
 private:
 	struct s_rest_route {
@@ -348,3 +385,4 @@ private:
 };
 
 #endif
+
